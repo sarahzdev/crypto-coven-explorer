@@ -1,21 +1,17 @@
-import { createClient } from "urql";
-import { useEffect, useState } from "react";
-import Header from "../components/Header";
+import { useQuery } from "urql";
+import Error from "../components/Error";
+import Layout from "../components/Layout";
+import Loading from "../components/Loading";
 
-const API_URL =
-  "https://api.thegraph.com/subgraphs/name/sazhang/sz-crypto-coven";
-
-const fillerQuery = `
+const SignsQuery = `
   query {
-    tokens(first: 6) {
+    tokens(first: 10) {
       id
       tokenID
       tokenURI
       externalURL
       image 
-      name 
-      description
-      type 
+      name
       sun 
       moon 
       rising
@@ -23,25 +19,20 @@ const fillerQuery = `
   }
 `;
 
-const client = createClient({
-  url: API_URL,
-});
-
 function AstrologicalChartExplorer() {
-  const [tokens, setTokens] = useState([]);
+  const [result, reexecuteQuery] = useQuery({
+    query: SignsQuery,
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { data, fetching, error } = result;
 
-  async function fetchData() {
-    const response = await client.query(fillerQuery).toPromise();
-    setTokens(response.data.tokens);
-  }
+  if (fetching) return <Loading />;
+  if (error) return <Error />;
+
+  const tokens = data.tokens;
 
   return (
-    <div className="font-serif bg-zinc-800 text-zinc-400">
-      <Header />
+    <Layout>
       <h1 className="text-4xl text-center">
         Browse witches by astrological sign
       </h1>
@@ -61,7 +52,7 @@ function AstrologicalChartExplorer() {
           </div>
         ))}
       </div>
-    </div>
+    </Layout>
   );
 }
 

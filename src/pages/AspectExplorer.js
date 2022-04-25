@@ -1,11 +1,9 @@
-import { createClient } from "urql";
-import { useEffect, useState } from "react";
-import Header from "../components/Header";
+import { useQuery } from "urql";
+import Error from "../components/Error";
+import Layout from "../components/Layout";
+import Loading from "../components/Loading";
 
-const API_URL =
-  "https://api.thegraph.com/subgraphs/name/sazhang/sz-crypto-coven";
-
-const fillerQuery = `
+const TraitsQuery = `
   query {
     tokens(first: 6) {
       id
@@ -13,35 +11,25 @@ const fillerQuery = `
       tokenURI
       externalURL
       image 
-      name 
-      description
-      type 
-      sun 
-      moon 
-      rising
+      name
     }
   }
 `;
 
-const client = createClient({
-  url: API_URL,
-});
-
 function AspectExplorer() {
-  const [tokens, setTokens] = useState([]);
+  const [result, reexecuteQuery] = useQuery({
+    query: TraitsQuery,
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { data, fetching, error } = result;
 
-  async function fetchData() {
-    const response = await client.query(fillerQuery).toPromise();
-    setTokens(response.data.tokens);
-  }
+  if (fetching) return <Loading />;
+  if (error) return <Error />;
+
+  const tokens = data.tokens;
 
   return (
-    <div className="font-serif bg-zinc-800 text-zinc-400">
-      <Header />
+    <Layout>
       <h1 className="text-4xl text-center">Browse witches by appearance</h1>
       <div className="flex flex-wrap justify-center">
         {tokens.map((token, index) => (
@@ -52,7 +40,7 @@ function AspectExplorer() {
           </div>
         ))}
       </div>
-    </div>
+    </Layout>
   );
 }
 
