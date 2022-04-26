@@ -6,7 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { createClient, Provider } from "urql";
 
 const API_URL =
-  "https://api.thegraph.com/subgraphs/name/sazhang/sz-crypto-coven";
+  "https://api.thegraph.com/subgraphs/name/sarahzdev/crypto-coven-api";
 
 const client = createClient({
   url: API_URL,
